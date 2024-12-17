@@ -1,5 +1,11 @@
 <script>
+
+import PostList from './PostList.vue';
+
 export default {
+  components: {
+    PostList,
+  },
   name: "Header",
   data() {
     return {
@@ -32,4 +38,6 @@ export default {
       </div>
     </div>
   </nav>
+
+<PostList/>
 </template>

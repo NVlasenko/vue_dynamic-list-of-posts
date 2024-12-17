@@ -1,5 +1,6 @@
 <script>
 import Loader from "./loader/Loader.vue";
+import { getUsers } from "../api/usersData";
 
 export default {
   components: {
@@ -18,7 +19,7 @@ export default {
   },
 
   mounted() {
-    this.registeredUsers = JSON.parse(localStorage.getItem("users") || "[]");
+    this.registeredUsers = getUsers();
 
     if (this.registeredUsers.length > 0) {
       const foundUser = this.registeredUsers.find(user => user.email === this.email);
@@ -30,42 +31,44 @@ export default {
 
   methods: {
     checkUserRegistration() {
-      this.registeredUsers = JSON.parse(localStorage.getItem("users") || "[]");
-      return this.registeredUsers.find((user) => user.email === this.email);
-    },
+  this.registeredUsers = getUsers();
+  const user = this.registeredUsers.find((user) => user.email === this.email);
+  console.log("Found user:", user);
+  return user;
+},
 
     handleSubmit() {
-      if (!this.email) {
-        this.error = "Email cannot be empty.";
-        return;
-      }
+  if (!this.email) {
+    this.error = "Email cannot be empty.";
+    return;
+  }
 
-      if (!this.email.includes("@") || !this.email.includes(".")) {
-        this.error = "Invalid email address. Please enter a valid email.";
-        return;
-      }
+  if (!this.email.includes("@") || !this.email.includes(".")) {
+    this.error = "Invalid email address. Please enter a valid email.";
+    return;
+  }
 
-      this.error = "";
-      this.isLoading = true;
+  this.error = "";
+  this.isLoading = true;
 
-      setTimeout(() => {
-        this.isLoading = false;
+  setTimeout(() => {
+    this.isLoading = false;
 
-        const registeredUser = this.checkUserRegistration();
+    const registeredUser = this.checkUserRegistration();
 
-        if (registeredUser) {
-          this.$router.push({
-            path: "header",
-            query: { email: this.email, name: registeredUser.name },
-          });
-        } else {
-          this.$router.push({
-            path: "/needToRegister",
-            query: { email: this.email },
-          });
-        }
-      }, 500);
-    },
+    if (registeredUser) {
+      this.$router.push({
+        path: "header",
+        query: { email: registeredUser.email, name: registeredUser.name },
+      });
+    } else {
+      this.$router.push({
+        path: "/needToRegister",
+        query: { email: this.email },
+      });
+    }
+  }, 500);
+},
   },
 };
 </script>

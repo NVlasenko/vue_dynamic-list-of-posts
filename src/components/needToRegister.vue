@@ -1,4 +1,5 @@
 <script>
+import { addUser, getUsers } from "../api/usersData";
 import Loader from "./loader/Loader.vue";
 
 export default {
@@ -17,17 +18,6 @@ export default {
     };
   },
   methods: {
-    getUsersFromStorage() {
-      const users = localStorage.getItem("users");
-      return users ? JSON.parse(users) : [];
-    },
-
-    saveUserToStorage(user) {
-      this.users.push(user);
-
-      localStorage.setItem("users", JSON.stringify(this.users));
-    },
-
     handleSubmit() {
       if (!this.name.trim()) {
         this.error = "Name is required.";
@@ -35,7 +25,7 @@ export default {
       }
 
       if (this.name.length <= 3) {
-        this.error = "Minimum allowed number of characters is 4";
+        this.error = "Minimum allowed number of characters is 4.";
         return;
       }
 
@@ -47,7 +37,7 @@ export default {
 
         const newUser = { email: this.email, name: this.name };
 
-        this.saveUserToStorage(newUser);
+        addUser(newUser);
 
         this.$router.push({
           path: "header",
@@ -57,7 +47,7 @@ export default {
     },
   },
   mounted() {
-    this.users = this.getUsersFromStorage();
+    this.users = getUsers();
   },
 };
 </script>
@@ -136,40 +126,6 @@ export default {
 </template>
 
 <style>
-/* .input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.loader {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: right 0.3s ease;
-} */
-
-/* .loader-button {
-  position: absolute;
-  top: 50%;
-  left: 0;
-} */
-
-/* .login-button {
-  position: relative;
-  min-width: 73px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} */
-
-/* .button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-} */
 .loader-button {
   position: absolute;
   top: 50%;
