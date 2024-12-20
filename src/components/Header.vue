@@ -18,6 +18,9 @@ export default {
       this.$router.push({ path: "/" });
     },
   },
+  errorCaptured(err, vm, info) {
+    console.error("Error captured:", err, "Info:", info);
+  },
 };
 </script>
 
@@ -39,5 +42,5 @@ export default {
     </div>
   </nav>
 
-<PostList/>
+  <PostList :userId="name" />
 </template>

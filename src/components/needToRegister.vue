@@ -1,11 +1,9 @@
 <script>
-import { addUser, getUsers } from "../api/usersData";
+import { addUser } from "../api/usersData";
 import Loader from "./loader/Loader.vue";
 
 export default {
-  components: {
-    Loader,
-  },
+  components: { Loader },
   name: "NeedToRegister",
   data() {
     return {
@@ -14,18 +12,17 @@ export default {
       error: "",
       isLoading: false,
       loaderStyle: { right: "25px", top: "50%" },
-      users: [],
     };
   },
   methods: {
     handleSubmit() {
       if (!this.name.trim()) {
-        this.error = "Name is required.";
+        this.error = "Имя обязательно.";
         return;
       }
 
       if (this.name.length <= 3) {
-        this.error = "Minimum allowed number of characters is 4.";
+        this.error = "Минимум 4 символа.";
         return;
       }
 
@@ -37,17 +34,17 @@ export default {
 
         const newUser = { email: this.email, name: this.name };
 
-        addUser(newUser);
-
-        this.$router.push({
-          path: "header",
-          query: { email: newUser.email, name: newUser.name },
-        });
+        try {
+          addUser(newUser);
+          this.$router.push({
+            path: "header",
+            query: { email: newUser.email, name: newUser.name },
+          });
+        } catch (error) {
+          this.error = error.message;
+        }
       }, 500);
     },
-  },
-  mounted() {
-    this.users = getUsers();
   },
 };
 </script>
@@ -58,7 +55,7 @@ export default {
       <h1 class="title is-3">You need to register</h1>
 
       <div class="field">
-        <label class="label" for="user-email"> Email </label>
+        <label class="label" for="user-email">Email</label>
         <div class="control has-icons-left">
           <div class="input-container">
             <input
@@ -71,18 +68,14 @@ export default {
               required
               disabled
             />
-            <Loader
-              v-if="isLoading"
-              class="loader"
-              :style="loaderStyle"
-            ></Loader>
+            <Loader v-if="isLoading" class="loader" :style="loaderStyle"></Loader>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-envelope" />
           </span>
         </div>
 
-        <label class="label mt-5" for="user-name"> Your Name </label>
+        <label class="label mt-5" for="user-name">Your Name</label>
         <div class="control has-icons-left">
           <div class="input-container">
             <input
@@ -95,11 +88,7 @@ export default {
               required
               minlength="4"
             />
-            <Loader
-              v-if="isLoading"
-              class="loader"
-              :style="loaderStyle"
-            ></Loader>
+            <Loader v-if="isLoading" class="loader" :style="loaderStyle"></Loader>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-user" />
@@ -125,6 +114,7 @@ export default {
   </div>
 </template>
 
+
 <style>
 .loader-button {
   position: absolute;
@@ -132,4 +122,4 @@ export default {
   left: 0;
   transform: translate(-50%, -50%);
 }
-</style>
+</style> 

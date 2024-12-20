@@ -31,10 +31,11 @@ export default {
 
   methods: {
     checkUserRegistration() {
-  this.registeredUsers = getUsers();
-  const user = this.registeredUsers.find((user) => user.email === this.email);
-  console.log("Found user:", user);
-  return user;
+    this.registeredUsers = getUsers();
+
+    const user = this.registeredUsers.find((user) => user.email === this.email);
+    console.log("Found user:", user);
+    return user;
 },
 
     handleSubmit() {
@@ -128,12 +129,11 @@ export default {
 }
 
 .input {
-  background-color: rgba(70, 90, 126, 0.4) !important;
+  
   transition: background-color 0.3s ease;
 }
 
 .input:focus {
-  background-color: rgba(4, 14, 34, 0.4) !important;
   outline: none;
   border: 1px solid rgba(70, 90, 126, 0.6);
   box-shadow: 0 0 5px rgba(70, 90, 126, 0.4);

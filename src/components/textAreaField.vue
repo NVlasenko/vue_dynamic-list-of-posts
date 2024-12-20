@@ -1,7 +1,14 @@
 <script>
+import { addUserPost } from "../api/usersData";
+
 export default {
   name: "textAreaField",
-
+  props: {
+    currentUserId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       title: "",
@@ -17,18 +24,37 @@ export default {
     validateBody() {
       this.isBodyError = !this.body.trim();
     },
+    generatePostId() {
+      return Math.floor(1000 + Math.random() * 9000).toString();
+    },
     handleSubmit(event) {
       event.preventDefault();
       this.validateInput();
       this.validateBody();
 
       if (!this.isTitleError && !this.isBodyError) {
-        console.log("Post saved:", { title: this.title, body: this.body });
+        const newPost = {
+          id: this.generatePostId(),
+          title: this.title.trim(),
+          body: this.body.trim(),
+        };
+
+        addUserPost(this.currentUserId, newPost);
+
         this.title = "";
         this.body = "";
         this.isTitleError = false;
         this.isBodyError = false;
+
+        this.$emit("new-post", newPost);
       }
+    },
+    handleCancel() {
+      this.title = "";
+      this.body = "";
+      this.isTitleError = false;
+      this.isBodyError = false;
+      this.$emit("cancel");
     },
   },
 };
@@ -38,6 +64,7 @@ export default {
   <div class="tile is-child box is-success">
     <p class="title">Create new post</p>
     <form @submit="handleSubmit">
+     
       <div class="field" data-cy="NameField">
         <label class="label" for="comment-author-name-title">Title</label>
         <div class="control has-icons-left has-icons-right">
@@ -67,6 +94,7 @@ export default {
         </p>
       </div>
 
+  
       <div class="field" data-cy="BodyField">
         <label class="label" for="comment-body">Write Post Body</label>
         <div class="control">
@@ -85,6 +113,7 @@ export default {
         </p>
       </div>
 
+     
       <div class="field is-grouped">
         <div class="control">
           <button
@@ -99,7 +128,7 @@ export default {
           <button
             type="reset"
             class="button is-link is-light"
-            @click="title = ''; body = ''; isTitleError = false; isBodyError = false;"
+            @click="handleCancel"
           >
             Cancel
           </button>
@@ -113,6 +142,8 @@ export default {
 .input.is-danger,
 .textarea.is-danger {
   border-color: #ff3860;
-  box-shadow: 0 0 0 0.125em rgba(255, 56, 96, 0.25);
+}
+.help.is-danger {
+  color: #ff3860;
 }
 </style>
