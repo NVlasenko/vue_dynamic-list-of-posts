@@ -36,11 +36,17 @@ export default {
 
         try {
           addUser(newUser);
-          this.$router.push({
-            path: "header",
-            query: { email: newUser.email, name: newUser.name },
-          });
+          this.$root.showGlobalLoader();
+          setTimeout(() => {
+            this.$router.push({
+              path: "header",
+              query: { email: newUser.email, name: newUser.name },
+            });
+
+            this.$root.hideGlobalLoader();
+          }, 300);
         } catch (error) {
+          this.isLoading = false;
           this.error = error.message;
         }
       }, 500);
@@ -68,7 +74,11 @@ export default {
               required
               disabled
             />
-            <Loader v-if="isLoading" class="loader" :style="loaderStyle"></Loader>
+            <Loader
+              v-if="isLoading"
+              class="loader"
+              :style="loaderStyle"
+            ></Loader>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-envelope" />
@@ -88,7 +98,11 @@ export default {
               required
               minlength="4"
             />
-            <Loader v-if="isLoading" class="loader" :style="loaderStyle"></Loader>
+            <Loader
+              v-if="isLoading"
+              class="loader"
+              :style="loaderStyle"
+            ></Loader>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-user" />
@@ -114,7 +128,6 @@ export default {
   </div>
 </template>
 
-
 <style>
 .loader-button {
   position: absolute;
@@ -122,4 +135,4 @@ export default {
   left: 0;
   transform: translate(-50%, -50%);
 }
-</style> 
+</style>

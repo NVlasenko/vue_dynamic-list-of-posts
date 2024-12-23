@@ -22,7 +22,9 @@ export default {
     this.registeredUsers = getUsers();
 
     if (this.registeredUsers.length > 0) {
-      const foundUser = this.registeredUsers.find(user => user.email === this.email);
+      const foundUser = this.registeredUsers.find(
+        (user) => user.email === this.email
+      );
       if (foundUser) {
         this.email = foundUser.email;
       }
@@ -31,45 +33,54 @@ export default {
 
   methods: {
     checkUserRegistration() {
-    this.registeredUsers = getUsers();
+      this.registeredUsers = getUsers();
 
-    const user = this.registeredUsers.find((user) => user.email === this.email);
-    console.log("Found user:", user);
-    return user;
-},
+      const user = this.registeredUsers.find(
+        (user) => user.email === this.email
+      );
+      console.log("Found user:", user);
+      return user;
+    },
 
     handleSubmit() {
-  if (!this.email) {
-    this.error = "Email cannot be empty.";
-    return;
-  }
+      if (!this.email) {
+        this.error = "Email cannot be empty.";
+        return;
+      }
 
-  if (!this.email.includes("@") || !this.email.includes(".")) {
-    this.error = "Invalid email address. Please enter a valid email.";
-    return;
-  }
+      if (!this.email.includes("@") || !this.email.includes(".")) {
+        this.error = "Invalid email address. Please enter a valid email.";
+        return;
+      }
 
-  this.error = "";
-  this.isLoading = true;
+      this.error = "";
+      this.isLoading = true;
 
-  setTimeout(() => {
-    this.isLoading = false;
-
-    const registeredUser = this.checkUserRegistration();
-
-    if (registeredUser) {
-      this.$router.push({
-        path: "header",
-        query: { email: registeredUser.email, name: registeredUser.name },
-      });
-    } else {
-      this.$router.push({
-        path: "/needToRegister",
-        query: { email: this.email },
-      });
-    }
-  }, 500);
-},
+      setTimeout(() => {
+        const registeredUser = this.checkUserRegistration();
+        if (registeredUser) {
+          this.$root.showGlobalLoader();
+          setTimeout(() => {
+            this.$router.push({
+              path: "/header",
+              query: { email: registeredUser.email, name: registeredUser.name },
+            });
+            this.isLoading = false;
+            this.$root.hideGlobalLoader();
+          }, 300);
+        } else {
+          this.$root.showGlobalLoader();
+          setTimeout(() => {
+            this.$router.push({
+              path: "/needToRegister",
+              query: { email: this.email },
+            });
+            this.isLoading = false;
+            this.$root.hideGlobalLoader();
+          }, 300);
+        }
+      }, 500);
+    },
   },
 };
 </script>
@@ -107,12 +118,11 @@ export default {
       </div>
 
       <div class="field">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           class="button is-primary login-button"
           :disabled="isLoading"
         >
-
           <span v-if="isLoading" class="button-content">
             <Loader class="loader loader-button" :style="loaderStyle" />
           </span>
@@ -129,7 +139,6 @@ export default {
 }
 
 .input {
-  
   transition: background-color 0.3s ease;
 }
 
@@ -164,10 +173,10 @@ export default {
   transform: translate(-50%, -50%);
   transition: right 0.3s ease;
   width: 20px;
-  height: 20px; 
+  height: 20px;
 }
 
-.loader-button{
+.loader-button {
   position: absolute;
   top: 50%;
   left: 0;

@@ -39,14 +39,13 @@ export default {
           body: this.body.trim(),
         };
 
+        this.$emit("new-post", newPost);
         addUserPost(this.currentUserId, newPost);
 
         this.title = "";
         this.body = "";
         this.isTitleError = false;
         this.isBodyError = false;
-
-        this.$emit("new-post", newPost);
       }
     },
     handleCancel() {
@@ -64,7 +63,6 @@ export default {
   <div class="tile is-child box is-success">
     <p class="title">Create new post</p>
     <form @submit="handleSubmit">
-     
       <div class="field" data-cy="NameField">
         <label class="label" for="comment-author-name-title">Title</label>
         <div class="control has-icons-left has-icons-right">
@@ -94,7 +92,6 @@ export default {
         </p>
       </div>
 
-  
       <div class="field" data-cy="BodyField">
         <label class="label" for="comment-body">Write Post Body</label>
         <div class="control">
@@ -113,7 +110,6 @@ export default {
         </p>
       </div>
 
-     
       <div class="field is-grouped">
         <div class="control">
           <button

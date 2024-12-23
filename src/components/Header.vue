@@ -1,6 +1,5 @@
 <script>
-
-import PostList from './PostList.vue';
+import PostList from "./PostList.vue";
 
 export default {
   components: {
