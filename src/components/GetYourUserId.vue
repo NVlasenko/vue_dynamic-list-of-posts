@@ -1,11 +1,7 @@
 <script>
-import Loader from "./loader/Loader.vue";
 import { getUsers } from "../api/usersData";
 
 export default {
-  components: {
-    Loader,
-  },
   name: "GetYourUserId",
   data() {
     return {
@@ -38,7 +34,6 @@ export default {
       const user = this.registeredUsers.find(
         (user) => user.email === this.email
       );
-      console.log("Found user:", user);
       return user;
     },
 
@@ -104,11 +99,14 @@ export default {
               required
               :disabled="isLoading"
             />
-            <Loader
-              v-if="isLoading"
-              class="loader"
-              :style="loaderStyle"
-            ></Loader>
+            <div v-if="isLoading" class="loader-container">
+              <div class="lds-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-envelope"></i>
@@ -124,7 +122,12 @@ export default {
           :disabled="isLoading"
         >
           <span v-if="isLoading" class="button-content">
-            <Loader class="loader loader-button" :style="loaderStyle" />
+            <div class="lds-ring">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
           </span>
           <span v-else class="button-content">Login</span>
         </button>
@@ -133,7 +136,7 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
 .help.is-danger {
   margin-top: 10px;
 }
@@ -160,26 +163,49 @@ export default {
 }
 
 .input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
 }
 
-.loader {
+.input {
+  padding-right: 40px !important;
+}
+.loader-container {
   position: absolute;
+  right: 10px;
   top: 50%;
-  left: -25px;
-  transform: translate(-50%, -50%);
-  transition: right 0.3s ease;
+  transform: translateY(-50%);
+}
+
+.lds-ring {
+  display: inline-block;
+  position: relative;
   width: 20px;
   height: 20px;
 }
 
-.loader-button {
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
   position: absolute;
-  top: 50%;
-  left: 0;
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  border: 3px solid #c0c0c0;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #c0c0c0 transparent transparent transparent;
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .login-button {

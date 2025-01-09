@@ -1,8 +1,14 @@
 <script>
 import { deleteUserPost } from "../api/usersData";
+import addComment from "./addComment.vue";
+import Comment from "./comment.vue";
 
 export default {
   name: "PostDetails",
+  components: {
+    addComment,
+    Comment,
+  },
   props: {
     post: {
       type: Object,
@@ -13,13 +19,42 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      isAddCommentVisible: false,
+    };
+  },
   methods: {
-    deletePost(postId) {
-      deleteUserPost(this.currentUserId, postId);
-      this.$emit("post-deleted", postId);
+    async removePost() {
+      try {
+        await deleteUserPost(this.currentUserId, this.post.id);
+        this.$emit("load-posts");
+        this.$emit("close");
+      } catch (err) {
+        console.error("Error deleting post:", err);
+      }
     },
-    editPost(postId) {
-      console.log(`Editing post with ID ${postId}`);
+    editPost() {
+      this.$emit("edit-post", this.post);
+    },
+    toggleAddComment() {
+      this.isAddCommentVisible = !this.isAddCommentVisible;
+    },
+    addCommentToPost(newComment) {
+      if (newComment) {
+        if (!this.post.comments) {
+          this.post.comments = [];
+        }
+        this.post.comments.push(newComment);
+        this.isAddCommentVisible = false;
+      } else {
+        console.error("The comment was not forwarded.");
+      }
+    },
+    deleteCommentFromPost(index) {
+      if (this.post.comments && this.post.comments.length > index) {
+        this.post.comments.splice(index, 1);
+      }
     },
   },
 };
@@ -34,15 +69,12 @@ export default {
         >
           <h2>#{{ post.id }}: {{ post.title }}</h2>
           <div class="is-flex">
-            <span
-              class="icon is-small is-right is-clickable"
-              @click="editPost(post.id)"
-            >
+            <span class="icon is-small is-right is-clickable" @click="editPost">
               <i class="fas fa-pen-to-square"></i>
             </span>
             <span
               class="icon is-small is-right has-text-danger is-clickable ml-3"
-              @click="deletePost(post.id)"
+              @click="removePost"
             >
               <i class="fas fa-trash"></i>
             </span>
@@ -50,18 +82,42 @@ export default {
         </div>
         <p data-cy="PostBody">{{ post.body }}</p>
       </div>
-      <div class="block">
-        <div class="block">
+      <div class="block" v-if="!isAddCommentVisible">
+        <div v-if="post.comments && post.comments.length > 0">
+          <div
+            v-for="(comment, index) in post.comments"
+            :key="index"
+            class="block"
+          >
+            <Comment
+              :name="comment.name"
+              :email="comment.email"
+              :body="comment.body"
+              :index="index"
+              @delete-comment="deleteCommentFromPost"
+            />
+          </div>
+        </div>
+        <div class="block" v-else>
           <p class="title is-4" data-cy="NoCommentsMessage">No comments yet</p>
         </div>
+      </div>
+      <div class="block" v-if="!isAddCommentVisible">
         <button
           data-cy="WriteCommentButton"
           type="button"
           class="button is-link"
+          @click="toggleAddComment"
         >
           Write a comment
         </button>
       </div>
+
+      <addComment
+        v-if="isAddCommentVisible"
+        @submit-comment="addCommentToPost"
+        @cancel-comment="toggleAddComment"
+      />
     </div>
   </div>
 </template>

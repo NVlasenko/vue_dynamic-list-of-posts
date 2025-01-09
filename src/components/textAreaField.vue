@@ -8,11 +8,19 @@ export default {
       type: String,
       required: true,
     },
+    editing: {
+      type: Boolean,
+      default: false,
+    },
+    post: {
+      type: Object,
+      default: null,
+    },
   },
   data() {
     return {
-      title: "",
-      body: "",
+      title: this.post?.title || "",
+      body: this.post?.body || "",
       isTitleError: false,
       isBodyError: false,
     };
@@ -34,26 +42,46 @@ export default {
 
       if (!this.isTitleError && !this.isBodyError) {
         const newPost = {
-          id: this.generatePostId(),
+          id: this.editing ? this.post.id : this.generatePostId(),
           title: this.title.trim(),
           body: this.body.trim(),
         };
 
-        this.$emit("new-post", newPost);
-        addUserPost(this.currentUserId, newPost);
+        if (this.editing) {
+          this.$emit("update-post", newPost);
+        } else {
+          this.$emit("new-post", newPost);
+        }
 
-        this.title = "";
-        this.body = "";
-        this.isTitleError = false;
-        this.isBodyError = false;
+        if (!this.editing) {
+          addUserPost(this.currentUserId, newPost);
+        }
+
+        this.resetForm();
       }
     },
-    handleCancel() {
+    resetForm() {
       this.title = "";
       this.body = "";
       this.isTitleError = false;
       this.isBodyError = false;
+    },
+    handleCancel() {
+      this.resetForm();
       this.$emit("cancel");
+    },
+  },
+  watch: {
+    post: {
+      immediate: true,
+      handler(newPost) {
+        if (this.editing && newPost) {
+          this.title = newPost.title || "";
+          this.body = newPost.body || "";
+        } else {
+          this.resetForm();
+        }
+      },
     },
   },
 };
@@ -61,7 +89,7 @@ export default {
 
 <template>
   <div class="tile is-child box is-success">
-    <p class="title">Create new post</p>
+    <p class="title">{{ editing ? "Edit post" : "Create new post" }}</p>
     <form @submit="handleSubmit">
       <div class="field" data-cy="NameField">
         <label class="label" for="comment-author-name-title">Title</label>
@@ -117,7 +145,7 @@ export default {
             class="button is-link"
             :disabled="isBodyError || isTitleError"
           >
-            Save
+            {{ editing ? "Update" : "Save" }}
           </button>
         </div>
         <div class="control">

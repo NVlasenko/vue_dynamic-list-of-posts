@@ -3,7 +3,6 @@ import textAreaField from "./textAreaField.vue";
 import { getUserPosts } from "../api/usersData";
 import PostDetails from "./PostDetails.vue";
 import Loader from "./loader/Loader.vue";
-
 export default {
   name: "PostList",
   components: {
@@ -24,6 +23,7 @@ export default {
       selectedPost: null,
       posts: [],
       isGlobalLoading: false,
+      isEditing: false,
     };
   },
   methods: {
@@ -31,6 +31,9 @@ export default {
       if (this.isPostDetailsVisible) {
         this.closePostDetails();
       }
+      this.isEditing = false;
+      this.selectedPost = null;
+      this.isPostDetailsVisible = false;
       this.isTextAreaVisible = !this.isTextAreaVisible;
     },
     openPost(postId) {
@@ -39,7 +42,7 @@ export default {
         this.isTextAreaVisible = false;
         setTimeout(() => {
           this.openPostDetails(postId);
-        }, 500);
+        }, 900);
       } else {
         this.openPostDetails(postId);
       }
@@ -51,25 +54,49 @@ export default {
         setTimeout(() => {
           this.selectedPost = this.posts.find((post) => post.id === postId);
           this.isPostDetailsVisible = true;
-        }, 500);
+        }, 800);
       }
 
       setTimeout(() => {
         this.hideGlobalLoader();
-      }, 200);
+      }, 500);
     },
     closePostDetails() {
-      this.isPostDetailsVisible = false;
-      this.selectedPost = null;
-      this.hideGlobalLoader();
+      this.isGlobalLoading = false;
+      setTimeout(() => {
+        this.isPostDetailsVisible = false;
+        this.selectedPost = null;
+        this.hideGlobalLoader();
+      }, 300);
     },
+
     addPost(newPost) {
-      this.posts.push(newPost);
+      this.showGlobalLoader();
+
+      const index = this.posts.findIndex((p) => p.id === newPost.id);
+      if (index === -1) {
+        this.posts.push(newPost);
+      } else {
+        console.warn(
+          "Post already exists with this ID. Use updatePost instead."
+        );
+      }
+
       this.isTextAreaVisible = false;
+      this.isEditing = false;
+
       setTimeout(() => {
         this.selectedPost = newPost;
         this.isPostDetailsVisible = true;
-      }, 300);
+        this.hideGlobalLoader();
+      }, 500);
+    },
+
+    editPost(post) {
+      this.selectedPost = post;
+      this.isEditing = true;
+      this.isTextAreaVisible = true;
+      this.isPostDetailsVisible = false;
     },
     loadUserPosts() {
       this.isGlobalLoading = false;
@@ -84,6 +111,24 @@ export default {
     },
     hideGlobalLoader() {
       this.isGlobalLoading = false;
+    },
+    updatePost(updatedPost) {
+      this.showGlobalLoader();
+      const postIndex = this.posts.findIndex((p) => p.id === updatedPost.id);
+      if (postIndex !== -1) {
+        this.posts.splice(postIndex, 1, updatedPost);
+      } else {
+        console.error("Post not found for update.");
+      }
+
+      this.isTextAreaVisible = false;
+      this.isEditing = false;
+
+      setTimeout(() => {
+        this.selectedPost = updatedPost;
+        this.isPostDetailsVisible = true;
+        this.hideGlobalLoader();
+      }, 400);
     },
   },
   mounted() {
@@ -104,7 +149,7 @@ export default {
             :class="{ 'is-light': isTextAreaVisible }"
             @click="toggleTextAreaField"
           >
-            {{ isTextAreaVisible ? "Close creation" : "Add New Post" }}
+            Add New Post
           </button>
         </div>
 
@@ -152,20 +197,39 @@ export default {
           @new-post="addPost"
           @cancel="toggleTextAreaField"
           :currentUserId="userId"
+          :editing="isEditing"
+          :post="isEditing ? selectedPost : null"
+          @update-post="updatePost"
         />
       </transition>
 
       <transition name="fade-slide">
-        <Loader v-if="isGlobalLoading" />
+        <div
+          v-show="isGlobalLoading"
+          style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          "
+        >
+          <Loader />
+        </div>
       </transition>
 
       <transition name="fade-slide">
-        <PostDetails
-          v-if="isPostDetailsVisible && !isGlobalLoading"
-          :post="selectedPost"
-          :currentUserId="userId"
-          @close="closePostDetails"
-        />
+        <div
+          v-show="isPostDetailsVisible && !isGlobalLoading"
+          style="position: relative"
+        >
+          <PostDetails
+            :post="selectedPost"
+            :currentUserId="userId"
+            @close="closePostDetails"
+            @load-posts="loadUserPosts"
+            @edit-post="editPost"
+          />
+        </div>
       </transition>
     </div>
   </main>
@@ -190,5 +254,11 @@ export default {
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(-20px);
+}
+
+.fade-slide-enter-to,
+.fade-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>

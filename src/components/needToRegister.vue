@@ -1,9 +1,7 @@
 <script>
 import { addUser } from "../api/usersData";
-import Loader from "./loader/Loader.vue";
 
 export default {
-  components: { Loader },
   name: "NeedToRegister",
   data() {
     return {
@@ -17,12 +15,12 @@ export default {
   methods: {
     handleSubmit() {
       if (!this.name.trim()) {
-        this.error = "Имя обязательно.";
+        this.error = "Name required.";
         return;
       }
 
       if (this.name.length <= 3) {
-        this.error = "Минимум 4 символа.";
+        this.error = "Minimum 4 characters.";
         return;
       }
 
@@ -74,11 +72,14 @@ export default {
               required
               disabled
             />
-            <Loader
-              v-if="isLoading"
-              class="loader"
-              :style="loaderStyle"
-            ></Loader>
+            <div v-if="isLoading" class="loader-container">
+              <div class="lds-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-envelope" />
@@ -98,11 +99,14 @@ export default {
               required
               minlength="4"
             />
-            <Loader
-              v-if="isLoading"
-              class="loader"
-              :style="loaderStyle"
-            ></Loader>
+            <div v-if="isLoading" class="loader-container">
+              <div class="lds-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
           </div>
           <span class="icon is-small is-left">
             <i class="fas fa-user" />
@@ -119,7 +123,12 @@ export default {
           :disabled="isLoading"
         >
           <span v-if="isLoading" class="button-content">
-            <Loader class="loader loader-button" :style="loaderStyle" />
+            <div class="lds-ring">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
           </span>
           <span v-else class="button-content">Register</span>
         </button>
@@ -128,7 +137,57 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
+.loader-container {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  border: 3px solid #c0c0c0;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #c0c0c0 transparent transparent transparent;
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.login-button {
+  position: relative;
+  min-width: 73px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .loader-button {
   position: absolute;
   top: 50%;

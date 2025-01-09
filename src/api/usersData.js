@@ -22,9 +22,8 @@ export const addUserPost = (userId, newPost) => {
     allPosts[userId] = [];
   }
 
-  if (allPosts[userId].find(post => post.id === newPost.id)) {
-    console.warn(`Post with ID ${newPost.id} already exists for user ${userId}.`);
-    return; 
+  if (allPosts[userId].find((post) => post.id === newPost.id)) {
+    return;
   }
 
   allPosts[userId].push(newPost);
@@ -37,11 +36,40 @@ export const getUserPosts = (userId) => {
 };
 
 export const deleteUserPost = (userId, postId) => {
+  return new Promise((resolve, reject) => {
+    const allPosts = JSON.parse(localStorage.getItem(USER_POSTS_KEY) || "{}");
+
+    if (allPosts[userId]) {
+      const postIndex = allPosts[userId].findIndex(
+        (post) => post.id === postId
+      );
+      if (postIndex !== -1) {
+        allPosts[userId].splice(postIndex, 1);
+        localStorage.setItem(USER_POSTS_KEY, JSON.stringify(allPosts));
+        resolve();
+      } else {
+        reject(`Post not found.`);
+      }
+    } else {
+      reject(`User posts not found.`);
+    }
+  });
+};
+
+export const editUserPost = (userId, updatedPost) => {
   const allPosts = JSON.parse(localStorage.getItem(USER_POSTS_KEY) || "{}");
-  
   if (allPosts[userId]) {
-    allPosts[userId] = allPosts[userId].filter(post => post.id !== postId);
-    localStorage.setItem(USER_POSTS_KEY, JSON.stringify(allPosts));
+    const postIndex = allPosts[userId].findIndex(
+      (post) => post.id === updatedPost.id
+    );
+    if (postIndex !== -1) {
+      allPosts[userId][postIndex] = updatedPost;
+      localStorage.setItem(USER_POSTS_KEY, JSON.stringify(allPosts));
+    } else {
+      console.warn(
+        `Post with ID ${updatedPost.id} not found for user ${userId}.`
+      );
+    }
   } else {
     console.warn(`No posts found for user ${userId}.`);
   }
