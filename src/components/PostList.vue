@@ -1,7 +1,7 @@
 <script>
 import textAreaField from "./textAreaField.vue";
 import { getUserPosts } from "../api/usersData";
-import PostDetails from "./PostDetails.vue";
+import PostDetails from "./PostPreview.vue";
 import Loader from "./loader/Loader.vue";
 export default {
   name: "PostList",

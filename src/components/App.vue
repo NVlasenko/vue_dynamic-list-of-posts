@@ -1,6 +1,7 @@
 <script>
 import { RouterView } from "vue-router";
-import Loader from "./components/loader/Loader.vue";
+import Loader from "./loader/Loader.vue";
+
 
 export default {
   components: {
